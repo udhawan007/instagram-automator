@@ -472,52 +472,6 @@ function copyWebhookUrl() {
   alert('Webhook URL copied: ' + el.value);
 }
 
-// Creator Hook Templates Picker
-function loadCreatorTemplate(type) {
-  if (type === 'lead_magnet') {
-    document.getElementById('ruleName').value = 'Viral Freebie / Guide Delivery';
-    document.getElementById('ruleTriggerKeywords').value = 'guide, link, send, ebook, blueprint, free';
-    document.getElementById('ruleExcludedKeywords').value = 'scam, fake, hate, refund, bot';
-    document.getElementById('ruleRequireFollow').checked = true;
-    handleFollowGateToggle();
-    document.getElementById('ruleFollowCheckMessage').value = 'Hey {username}! 👋 One quick step before we unlock your free guide:\n\nFollow our Instagram profile, then tap "I am following" below to receive instant access! 🚀';
-    document.getElementById('ruleFollowCheckPublicReply').value = 'Please follow our profile first and check your DMs to unlock the guide! 🔒✨';
-    document.getElementById('rulePublicReplies').value = 'Just sent the guide to your DMs! Check your requests 🚀\nSent to your inbox! Let me know if you got it ✨\nCheck your DMs! I just dropped the full link there 📩';
-    document.getElementById('ruleDmMessage').value = 'Hey {username}! 🎉 Here is your free blueprint guide: https://yourbrand.com/free-guide\n\nLet me know what you think!';
-    document.getElementById('ruleDmDelay').value = '0';
-  } else if (type === 'discount_code') {
-    document.getElementById('ruleName').value = 'Reel Flash Sale / 20% Discount Code';
-    document.getElementById('ruleTriggerKeywords').value = 'discount, price, code, sale, coupon, buy, cost';
-    document.getElementById('ruleExcludedKeywords').value = 'refund, scam, expensive, bad';
-    document.getElementById('ruleRequireFollow').checked = false;
-    handleFollowGateToggle();
-    document.getElementById('rulePublicReplies').value = 'Sent you the exclusive 20% discount code in your DMs! 🎁\nCheck your inbox for your VIP promo code ⚡\nDM sent! Use the coupon code at checkout 🙌';
-    document.getElementById('ruleDmMessage').value = 'Hey {username}! Thanks for watching the reel! 🎁\n\nUse code REEL20 at checkout for 20% OFF everything: https://yourbrand.com/shop\n\nEnjoy shopping! 🛍️';
-    document.getElementById('ruleDmDelay').value = '5';
-  } else if (type === 'event_access') {
-    document.getElementById('ruleName').value = 'Live Webinar & Workshop Invitation';
-    document.getElementById('ruleTriggerKeywords').value = 'access, invite, join, link, seat, workshop';
-    document.getElementById('ruleExcludedKeywords').value = 'scam, fake, hate, spam';
-    document.getElementById('ruleRequireFollow').checked = true;
-    handleFollowGateToggle();
-    document.getElementById('ruleFollowCheckMessage').value = 'Hey {username}! 🎟️ To secure your seat, follow our profile and tap "I am following" below for your private access pass! 🎓';
-    document.getElementById('ruleFollowCheckPublicReply').value = 'Follow our profile first and check your DMs to unlock your workshop invite! 🎟️✨';
-    document.getElementById('rulePublicReplies').value = 'Sent your private workshop invite to your DMs! 🎓\nCheck your inbox for your access link 🎟️\nDM sent! See you inside the workshop 🙌';
-    document.getElementById('ruleDmMessage').value = 'Hey {username}! 🎓 Here is your private invitation link: https://yourbrand.com/workshop-live\n\nMake sure to add it to your calendar!';
-    document.getElementById('ruleDmDelay').value = '0';
-  } else if (type === 'preset_pack') {
-    document.getElementById('ruleName').value = 'Creator Preset & Camera LUT Download';
-    document.getElementById('ruleTriggerKeywords').value = 'preset, lut, settings, filter, camera, download';
-    document.getElementById('ruleExcludedKeywords').value = 'fake, bad, refund, bot';
-    document.getElementById('ruleRequireFollow').checked = true;
-    handleFollowGateToggle();
-    document.getElementById('ruleFollowCheckMessage').value = 'Hey {username}! 📸 To unlock the exact Lightroom preset from this reel, follow our profile and tap "I am following" below! ✨';
-    document.getElementById('ruleFollowCheckPublicReply').value = 'Please follow our profile first and check your DMs for the preset link! 📸✨';
-    document.getElementById('rulePublicReplies').value = 'Sent the preset download link to your DMs! 📸\nCheck your inbox for the camera settings and LUTs ✨\nDM sent! Enjoy editing your reels 🙌';
-    document.getElementById('ruleDmMessage').value = 'Hey {username}! 📸 Here is the direct download link for the preset pack: https://yourbrand.com/presets\n\nTag me in your edits so I can repost them! 🔥';
-    document.getElementById('ruleDmDelay').value = '0';
-  }
-}
 
 // Multi-Step Modal Builder
 function openCreateModal() {

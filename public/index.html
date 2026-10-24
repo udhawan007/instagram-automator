@@ -193,46 +193,7 @@
     <!-- TAB 1: AUTOMATIONS LIST -->
     <div id="tab-automations" class="tab-content space-y-6">
       
-      <!-- Creator Hook Inspiration Bar -->
-      <div class="glass-panel p-4 sm:p-5 rounded-2xl sm:rounded-3xl space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>
-            <span class="text-xs font-bold uppercase tracking-wider text-white">1-Click Creator Hook Templates</span>
-          </div>
-          <span class="text-[11px] text-slate-400 hidden sm:inline">Click to launch with battle-tested copy</span>
-        </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-          <button onclick="openWithTemplate('lead_magnet')" class="p-3 rounded-2xl bg-[#090d19] hover:bg-pink-950/30 border border-white/5 hover:border-pink-500/40 text-left transition-all group active:scale-95">
-            <div class="flex items-center gap-2 text-pink-400 text-xs font-bold">
-              <span>📘 Free Guide / Ebook</span>
-            </div>
-            <p class="text-[11px] text-slate-400 mt-1 line-clamp-1 group-hover:text-slate-300">"Comment GUIDE for the link"</p>
-          </button>
-
-          <button onclick="openWithTemplate('discount_code')" class="p-3 rounded-2xl bg-[#090d19] hover:bg-pink-950/30 border border-white/5 hover:border-pink-500/40 text-left transition-all group active:scale-95">
-            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold">
-              <span>🏷️ 20% Discount Promo</span>
-            </div>
-            <p class="text-[11px] text-slate-400 mt-1 line-clamp-1 group-hover:text-slate-300">"Comment VIP for coupon code"</p>
-          </button>
-
-          <button onclick="openWithTemplate('event_access')" class="p-3 rounded-2xl bg-[#090d19] hover:bg-pink-950/30 border border-white/5 hover:border-pink-500/40 text-left transition-all group active:scale-95">
-            <div class="flex items-center gap-2 text-purple-400 text-xs font-bold">
-              <span>🎓 Workshop Invite</span>
-            </div>
-            <p class="text-[11px] text-slate-400 mt-1 line-clamp-1 group-hover:text-slate-300">"Comment ACCESS for your seat"</p>
-          </button>
-
-          <button onclick="openWithTemplate('preset_pack')" class="p-3 rounded-2xl bg-[#090d19] hover:bg-pink-950/30 border border-white/5 hover:border-pink-500/40 text-left transition-all group active:scale-95">
-            <div class="flex items-center gap-2 text-blue-400 text-xs font-bold">
-              <span>📸 Camera Preset / LUT</span>
-            </div>
-            <p class="text-[11px] text-slate-400 mt-1 line-clamp-1 group-hover:text-slate-300">"Comment PRESET for settings"</p>
-          </button>
-        </div>
-      </div>
 
       <!-- Automations Cards List -->
       <div id="automationsList" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -623,30 +584,7 @@
         </button>
       </div>
 
-      <!-- Creator Hook Templates Picker -->
-      <div class="p-3.5 rounded-2xl bg-gradient-to-r from-pink-950/30 via-purple-950/30 to-slate-900 border border-pink-800/30 space-y-2 shrink-0">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-pink-300 flex items-center gap-1.5">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400"></i>
-            <span>Load Proven Creator Hook Template:</span>
-          </span>
-          <span class="text-[10px] text-slate-400">1-click fill</span>
-        </div>
-        <div class="flex flex-wrap gap-1.5">
-          <button type="button" onclick="loadCreatorTemplate('lead_magnet')" class="text-[11px] font-medium bg-[#050811] hover:bg-pink-900/30 text-slate-200 hover:text-pink-300 px-2.5 py-1 rounded-lg border border-white/10 hover:border-pink-800/50 transition-colors">
-            📘 Free Guide / Ebook
-          </button>
-          <button type="button" onclick="loadCreatorTemplate('discount_code')" class="text-[11px] font-medium bg-[#050811] hover:bg-pink-900/30 text-slate-200 hover:text-pink-300 px-2.5 py-1 rounded-lg border border-white/10 hover:border-pink-800/50 transition-colors">
-            🏷️ VIP Discount Promo
-          </button>
-          <button type="button" onclick="loadCreatorTemplate('event_access')" class="text-[11px] font-medium bg-[#050811] hover:bg-pink-900/30 text-slate-200 hover:text-pink-300 px-2.5 py-1 rounded-lg border border-white/10 hover:border-pink-800/50 transition-colors">
-            🎓 Webinar / Event Access
-          </button>
-          <button type="button" onclick="loadCreatorTemplate('preset_pack')" class="text-[11px] font-medium bg-[#050811] hover:bg-pink-900/30 text-slate-200 hover:text-pink-300 px-2.5 py-1 rounded-lg border border-white/10 hover:border-pink-800/50 transition-colors">
-            📸 Influencer Preset / LUT
-          </button>
-        </div>
-      </div>
+
 
       <input type="hidden" id="ruleId">
 
