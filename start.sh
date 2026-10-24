@@ -6,7 +6,8 @@ cd "$DIR"
 PID=$(lsof -Pi :3750 -sTCP:LISTEN -t)
 if [ -z "$PID" ]; then
     echo "Starting Instagram Automator server..."
-    nohup /opt/homebrew/bin/node "$DIR/server.js" >> "$DIR/automator.log" 2>&1 &
+    NODE_BIN="$(which node 2>/dev/null || echo '/opt/homebrew/bin/node')"
+    nohup "$NODE_BIN" "$DIR/server.js" >> "$DIR/automator.log" 2>&1 &
     disown
     
     # Wait for server to be responsive
