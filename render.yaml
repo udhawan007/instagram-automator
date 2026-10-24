@@ -3,6 +3,8 @@ services:
     name: instagram-automator
     env: node
     plan: free
+    branch: main
+    autoDeployTrigger: commit
     buildCommand: npm install
     startCommand: node server.js
     envVars:
