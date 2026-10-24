@@ -9,6 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchSettings();
   lucide.createIcons();
 
+  // Handle URL query parameters for OAuth redirects
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tab') === 'settings') {
+    switchTab('settings');
+  }
+  if (urlParams.get('connected') === 'success') {
+    switchTab('settings');
+    alert('🎉 Instagram Account Connected Successfully! Your automations are now active 24/7.');
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (urlParams.get('auth_error')) {
+    switchTab('settings');
+    alert('Instagram Connection Error: ' + decodeURIComponent(urlParams.get('auth_error')));
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
   // Listen to scope dropdown in simulator
   const simScope = document.getElementById('simScopeSelect');
   if (simScope) {
@@ -419,25 +434,239 @@ async function clearLogs() {
   fetchStatus();
 }
 
-// Settings
+// Settings & Instagram Connection (Hypello Flow)
 async function fetchSettings() {
   try {
     const res = await fetch('/api/settings');
     const data = await res.json();
     currentSettings = data.settings || {};
 
-    document.getElementById('settingToken').value = currentSettings.page_access_token || '';
-    document.getElementById('settingVerifyToken').value = currentSettings.webhook_verify_token || '';
+    if (document.getElementById('settingToken')) {
+      document.getElementById('settingToken').value = currentSettings.page_access_token || '';
+    }
+    if (document.getElementById('settingVerifyToken')) {
+      document.getElementById('settingVerifyToken').value = currentSettings.webhook_verify_token || '';
+    }
+    if (document.getElementById('settingAppId')) {
+      document.getElementById('settingAppId').value = currentSettings.meta_app_id || '';
+    }
+    if (document.getElementById('settingAppSecret')) {
+      document.getElementById('settingAppSecret').value = currentSettings.meta_app_secret || '';
+    }
+
+    // Dynamic Host URLs for Localhost or Render Cloud
+    const origin = window.location.origin;
+    if (document.getElementById('settingWebhookUrl')) {
+      document.getElementById('settingWebhookUrl').value = origin + '/api/webhook';
+    }
+    if (document.getElementById('settingOAuthRedirectUrl')) {
+      document.getElementById('settingOAuthRedirectUrl').value = origin + '/api/auth/callback';
+    }
 
     const isLive = currentSettings.mode === 'live';
     const toggle = document.getElementById('settingModeToggle');
     const label = document.getElementById('settingModeLabel');
-    toggle.checked = isLive;
-    label.textContent = isLive ? 'Live Mode (Real Instagram)' : 'Sandbox Mode';
-    label.className = isLive ? 'text-xs font-semibold text-pink-400' : 'text-xs font-semibold text-emerald-400';
+    if (toggle && label) {
+      toggle.checked = isLive;
+      label.textContent = isLive ? 'Live Mode (Real Instagram)' : 'Sandbox Mode';
+      label.className = isLive ? 'text-xs font-semibold text-pink-400' : 'text-xs font-semibold text-emerald-400';
+    }
+
+    await fetchInstagramStatus();
   } catch (e) {
     console.error('Settings error:', e);
   }
+}
+
+async function fetchInstagramStatus() {
+  try {
+    const res = await fetch('/api/instagram/status');
+    const data = await res.json();
+
+    const connectedCard = document.getElementById('connectedAccountCard');
+    const disconnectedCard = document.getElementById('disconnectedCard');
+
+    if (data.connected && data.hasToken) {
+      if (connectedCard) connectedCard.classList.remove('hidden');
+      if (disconnectedCard) disconnectedCard.classList.add('hidden');
+
+      const uEl = document.getElementById('connectedUsername');
+      if (uEl) uEl.textContent = '@' + (data.username || 'instagram_creator');
+
+      const aEl = document.getElementById('connectedAccountType');
+      if (aEl) aEl.textContent = (data.accountType || 'Professional Creator') + ' Account • Connected & Active';
+
+      const avatar = document.getElementById('connectedAvatar');
+      if (avatar) {
+        if (data.profilePic) {
+          avatar.src = data.profilePic;
+        } else {
+          avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || 'IG')}&background=ec4899&color=fff&bold=true`;
+        }
+      }
+    } else {
+      if (connectedCard) connectedCard.classList.add('hidden');
+      if (disconnectedCard) disconnectedCard.classList.remove('hidden');
+    }
+    lucide.createIcons();
+  } catch (e) {
+    console.error('Instagram status error:', e);
+  }
+}
+
+// 1-Click Instagram OAuth Flow (Hypello direct authorization)
+async function startInstagramOAuth() {
+  try {
+    const res = await fetch('/api/auth/instagram/url');
+    const data = await res.json();
+
+    if (data.isConfigured && data.igOauthUrl) {
+      window.location.href = data.igOauthUrl;
+    } else {
+      const advBox = document.getElementById('advancedConnectBox');
+      if (advBox) advBox.classList.remove('hidden');
+      const input = document.getElementById('settingAppId');
+      if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth' });
+      }
+      alert('To enable 1-Click Connect, enter your Meta App ID below (or paste your Page Access Token under "Direct Token Paste")!');
+    }
+  } catch (e) {
+    alert('Failed to initialize Instagram login: ' + e.message);
+  }
+}
+
+function toggleAdvancedConnect() {
+  const box = document.getElementById('advancedConnectBox');
+  if (box) box.classList.toggle('hidden');
+}
+
+function switchConnectTab(tab) {
+  const oauthPane = document.getElementById('connectPaneOauth');
+  const tokenPane = document.getElementById('connectPaneToken');
+  const btnOauth = document.getElementById('tabBtnOauth');
+  const btnToken = document.getElementById('tabBtnToken');
+
+  if (tab === 'oauth') {
+    if (oauthPane) oauthPane.classList.remove('hidden');
+    if (tokenPane) tokenPane.classList.add('hidden');
+    if (btnOauth) btnOauth.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30 transition-all';
+    if (btnToken) btnToken.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white border border-transparent transition-all';
+  } else {
+    if (oauthPane) oauthPane.classList.add('hidden');
+    if (tokenPane) tokenPane.classList.remove('hidden');
+    if (btnToken) btnToken.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30 transition-all';
+    if (btnOauth) btnOauth.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white border border-transparent transition-all';
+  }
+  lucide.createIcons();
+}
+
+async function saveOAuthCredentials() {
+  const appId = document.getElementById('settingAppId').value.trim();
+  const appSecret = document.getElementById('settingAppSecret').value.trim();
+
+  if (!appId) {
+    alert('Please enter your Meta App ID');
+    return;
+  }
+
+  await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ meta_app_id: appId, meta_app_secret: appSecret })
+  });
+
+  const res = await fetch('/api/auth/instagram/url');
+  const data = await res.json();
+  if (data.igOauthUrl) {
+    window.location.href = data.igOauthUrl;
+  } else {
+    alert('Credentials saved! You can now click 1-Click Connect Instagram.');
+    fetchSettings();
+  }
+}
+
+async function connectManualToken() {
+  const token = document.getElementById('settingToken').value.trim();
+  if (!token) {
+    alert('Please paste a valid Instagram Page Access Token');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/instagram/connect-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert(`🎉 Account @${data.account.username} connected successfully! Live mode activated.`);
+      fetchSettings();
+      fetchStatus();
+    } else {
+      alert('Connection failed: ' + (data.error || 'Invalid token'));
+    }
+  } catch (e) {
+    alert('Error connecting account: ' + e.message);
+  }
+}
+
+async function testInstagramConnection() {
+  try {
+    const res = await fetch('/api/instagram/test', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ ' + data.message);
+    } else {
+      alert('⚠️ Test failed: ' + (data.error || 'Token invalid or expired'));
+    }
+  } catch (e) {
+    alert('Failed to ping Meta API: ' + e.message);
+  }
+}
+
+async function disconnectInstagram() {
+  if (!confirm('Are you sure you want to disconnect your Instagram account? Your automations will switch back to offline Sandbox mode.')) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/instagram/disconnect', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      alert('Instagram account disconnected.');
+      fetchSettings();
+      fetchStatus();
+    }
+  } catch (e) {
+    alert('Error disconnecting: ' + e.message);
+  }
+}
+
+function copyOAuthRedirectUrl() {
+  const el = document.getElementById('settingOAuthRedirectUrl');
+  navigator.clipboard.writeText(el.value);
+  alert('Redirect URI copied: ' + el.value);
+}
+
+function copyWebhookUrl() {
+  const el = document.getElementById('settingWebhookUrl');
+  navigator.clipboard.writeText(el.value);
+  alert('Webhook URL copied: ' + el.value);
+}
+
+async function saveVerifyToken() {
+  const verifyToken = document.getElementById('settingVerifyToken').value.trim();
+  await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ webhook_verify_token: verifyToken })
+  });
+  alert('Webhook Verify Token saved!');
+  fetchSettings();
 }
 
 async function toggleMode() {
@@ -450,26 +679,6 @@ async function toggleMode() {
   });
   fetchSettings();
   fetchStatus();
-}
-
-async function saveSettings() {
-  const token = document.getElementById('settingToken').value.trim();
-  const verifyToken = document.getElementById('settingVerifyToken').value.trim();
-
-  await fetch('/api/settings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ page_access_token: token, webhook_verify_token: verifyToken })
-  });
-
-  alert('Meta API configuration saved!');
-  fetchSettings();
-}
-
-function copyWebhookUrl() {
-  const el = document.getElementById('settingWebhookUrl');
-  navigator.clipboard.writeText(el.value);
-  alert('Webhook URL copied: ' + el.value);
 }
 
 

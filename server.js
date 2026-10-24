@@ -556,6 +556,286 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // Instagram Account & OAuth Endpoints (Hypello-style simplified connection)
+    if (pathname === '/api/instagram/status' && req.method === 'GET') {
+      const connected = getSetting('ig_connected') === 'true';
+      res.writeHead(200);
+      res.end(JSON.stringify({
+        connected,
+        username: getSetting('ig_username', ''),
+        accountId: getSetting('ig_account_id', ''),
+        profilePic: getSetting('ig_profile_picture', ''),
+        accountType: getSetting('ig_account_type', 'CREATOR'),
+        connectedAt: getSetting('ig_connected_at', ''),
+        mode: getSetting('mode', 'sandbox'),
+        appId: getSetting('meta_app_id', ''),
+        hasToken: !!getSetting('page_access_token')
+      }));
+      return;
+    }
+
+    if (pathname === '/api/auth/instagram/url' && req.method === 'GET') {
+      const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3750';
+      const proto = req.headers['x-forwarded-proto'] || (host.includes('localhost') ? 'http' : 'https');
+      const redirectUri = `${proto}://${host}/api/auth/callback`;
+      const appId = getSetting('meta_app_id', '');
+
+      const igOauthUrl = appId ?
+        `https://www.instagram.com/oauth/authorize?force_reauth=false&client_id=${encodeURIComponent(appId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments')}&enable_fb_login=0` : '';
+
+      const fbOauthUrl = appId ?
+        `https://www.facebook.com/v20.0/dialog/oauth?client_id=${encodeURIComponent(appId)}&display=page&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('business_management,pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,instagram_basic,instagram_manage_comments')}` : '';
+
+      res.writeHead(200);
+      res.end(JSON.stringify({
+        appId,
+        redirectUri,
+        igOauthUrl,
+        fbOauthUrl,
+        isConfigured: !!appId
+      }));
+      return;
+    }
+
+    if (pathname === '/api/auth/callback' && req.method === 'GET') {
+      const code = parsedUrl.searchParams.get('code');
+      const error = parsedUrl.searchParams.get('error');
+      const errorReason = parsedUrl.searchParams.get('error_reason');
+      const errorDesc = parsedUrl.searchParams.get('error_description');
+
+      if (error || errorReason) {
+        res.writeHead(302, { Location: `/?tab=settings&auth_error=${encodeURIComponent(errorDesc || errorReason || error)}` });
+        res.end();
+        return;
+      }
+
+      if (!code) {
+        res.writeHead(302, { Location: `/?tab=settings&auth_error=No+authorization+code+received` });
+        res.end();
+        return;
+      }
+
+      const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3750';
+      const proto = req.headers['x-forwarded-proto'] || (host.includes('localhost') ? 'http' : 'https');
+      const redirectUri = `${proto}://${host}/api/auth/callback`;
+
+      const appId = getSetting('meta_app_id', '');
+      const appSecret = getSetting('meta_app_secret', '');
+
+      try {
+        let accessToken = '';
+        let userId = '';
+        let username = '';
+        let profilePic = '';
+        let accountType = 'CREATOR';
+
+        // 1. Try direct Instagram OAuth token exchange
+        const formParams = new URLSearchParams({
+          client_id: appId,
+          client_secret: appSecret,
+          grant_type: 'authorization_code',
+          redirect_uri: redirectUri,
+          code: code
+        });
+
+        const tokenRes = await fetch('https://api.instagram.com/oauth/access_token', {
+          method: 'POST',
+          body: formParams
+        });
+        const tokenData = await tokenRes.json();
+
+        if (tokenData.access_token) {
+          accessToken = tokenData.access_token;
+          userId = tokenData.user_id ? String(tokenData.user_id) : '';
+
+          // Exchange for long-lived 60-day token
+          if (appSecret) {
+            try {
+              const longRes = await fetch(`https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${encodeURIComponent(appSecret)}&access_token=${encodeURIComponent(accessToken)}`);
+              const longData = await longRes.json();
+              if (longData.access_token) accessToken = longData.access_token;
+            } catch (e) {
+              console.error('Long-lived token exchange error:', e);
+            }
+          }
+
+          // Fetch user profile
+          try {
+            const meRes = await fetch(`https://graph.instagram.com/v20.0/me?fields=id,username,account_type,profile_picture_url&access_token=${encodeURIComponent(accessToken)}`);
+            const meData = await meRes.json();
+            if (meData.username) {
+              username = meData.username;
+              accountType = meData.account_type || accountType;
+              profilePic = meData.profile_picture_url || '';
+            }
+          } catch (e) {
+            console.error('Profile fetch error:', e);
+          }
+        } else {
+          // 2. Try Facebook Graph OAuth exchange (if initiated via FB dialog)
+          const fbUrl = `https://graph.facebook.com/v20.0/oauth/access_token?client_id=${encodeURIComponent(appId)}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${encodeURIComponent(appSecret)}&code=${encodeURIComponent(code)}`;
+          const fbRes = await fetch(fbUrl);
+          const fbData = await fbRes.json();
+
+          if (fbData.access_token) {
+            accessToken = fbData.access_token;
+
+            try {
+              const fbLongRes = await fetch(`https://graph.facebook.com/v20.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${encodeURIComponent(appId)}&client_secret=${encodeURIComponent(appSecret)}&fb_exchange_token=${encodeURIComponent(accessToken)}`);
+              const fbLongData = await fbLongRes.json();
+              if (fbLongData.access_token) accessToken = fbLongData.access_token;
+            } catch {}
+
+            const accountsRes = await fetch(`https://graph.facebook.com/v20.0/me/accounts?fields=id,name,access_token,instagram_business_account{id,username,profile_picture_url}&access_token=${encodeURIComponent(accessToken)}`);
+            const accountsData = await accountsRes.json();
+
+            if (accountsData.data && accountsData.data.length > 0) {
+              const pageWithIg = accountsData.data.find(p => p.instagram_business_account) || accountsData.data[0];
+              if (pageWithIg.instagram_business_account) {
+                userId = pageWithIg.instagram_business_account.id;
+                username = pageWithIg.instagram_business_account.username;
+                profilePic = pageWithIg.instagram_business_account.profile_picture_url || '';
+              }
+              if (pageWithIg.access_token) {
+                accessToken = pageWithIg.access_token;
+              }
+            }
+          } else {
+            throw new Error(tokenData.error_message || fbData.error?.message || 'Failed to exchange authorization code');
+          }
+        }
+
+        if (accessToken) {
+          setSetting('page_access_token', accessToken);
+          setSetting('ig_connected', 'true');
+          setSetting('mode', 'live');
+          if (userId) setSetting('ig_account_id', String(userId));
+          if (username) setSetting('ig_username', username);
+          if (profilePic) setSetting('ig_profile_picture', profilePic);
+          setSetting('ig_account_type', accountType);
+          setSetting('ig_connected_at', new Date().toISOString());
+
+          res.writeHead(302, { Location: `/?tab=settings&connected=success` });
+          res.end();
+          return;
+        } else {
+          throw new Error('No access token returned by Meta');
+        }
+      } catch (err) {
+        console.error('OAuth Callback Exception:', err);
+        res.writeHead(302, { Location: `/?tab=settings&auth_error=${encodeURIComponent(err.message)}` });
+        res.end();
+        return;
+      }
+    }
+
+    if (pathname === '/api/instagram/connect-token' && req.method === 'POST') {
+      try {
+        const b = await parseBody(req);
+        const token = (b.token || '').trim();
+        if (!token) throw new Error('Access token cannot be empty');
+
+        let username = '';
+        let userId = '';
+        let profilePic = '';
+        let accountType = 'PROFESSIONAL';
+
+        // Verify with Meta Graph API
+        try {
+          const meRes = await fetch(`https://graph.instagram.com/v20.0/me?fields=id,username,account_type,profile_picture_url&access_token=${encodeURIComponent(token)}`);
+          const meData = await meRes.json();
+          if (meData.username) {
+            username = meData.username;
+            userId = meData.id;
+            accountType = meData.account_type || accountType;
+            profilePic = meData.profile_picture_url || '';
+          }
+        } catch {}
+
+        if (!username) {
+          try {
+            const fbRes = await fetch(`https://graph.facebook.com/v20.0/me/accounts?fields=id,name,instagram_business_account{id,username,profile_picture_url}&access_token=${encodeURIComponent(token)}`);
+            const fbData = await fbRes.json();
+            if (fbData.data && fbData.data.length > 0) {
+              const pageWithIg = fbData.data.find(p => p.instagram_business_account);
+              if (pageWithIg && pageWithIg.instagram_business_account) {
+                username = pageWithIg.instagram_business_account.username;
+                userId = pageWithIg.instagram_business_account.id;
+                profilePic = pageWithIg.instagram_business_account.profile_picture_url || '';
+              }
+            }
+          } catch {}
+        }
+
+        setSetting('page_access_token', token);
+        setSetting('ig_connected', 'true');
+        setSetting('mode', 'live');
+        if (username) setSetting('ig_username', username);
+        if (userId) setSetting('ig_account_id', String(userId));
+        if (profilePic) setSetting('ig_profile_picture', profilePic);
+        setSetting('ig_account_type', accountType);
+        setSetting('ig_connected_at', new Date().toISOString());
+
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          success: true,
+          account: {
+            username: username || 'instagram_creator',
+            id: userId,
+            profile_picture: profilePic,
+            account_type: accountType
+          }
+        }));
+      } catch (e) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: e.message }));
+      }
+      return;
+    }
+
+    if (pathname === '/api/instagram/disconnect' && req.method === 'POST') {
+      setSetting('page_access_token', '');
+      setSetting('ig_connected', 'false');
+      setSetting('ig_username', '');
+      setSetting('ig_account_id', '');
+      setSetting('ig_profile_picture', '');
+      setSetting('mode', 'sandbox');
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true }));
+      return;
+    }
+
+    if (pathname === '/api/instagram/test' && req.method === 'POST') {
+      const token = getSetting('page_access_token', '');
+      if (!token) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ success: false, error: 'No Instagram Access Token configured' }));
+        return;
+      }
+
+      try {
+        const resp = await fetch(`https://graph.facebook.com/v20.0/me?access_token=${encodeURIComponent(token)}`);
+        const data = await resp.json();
+        if (data.error) {
+          res.writeHead(400);
+          res.end(JSON.stringify({ success: false, error: data.error.message || 'Token is invalid or expired' }));
+          return;
+        }
+
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          success: true,
+          message: 'Connection verified! Your Instagram API token is active and authorized with Meta.',
+          data
+        }));
+      } catch (e) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+      return;
+    }
+
+
     // Meta Webhooks
     if (pathname === '/api/webhook' && req.method === 'GET') {
       const mode = parsedUrl.searchParams.get('hub.mode');
