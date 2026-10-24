@@ -12,26 +12,116 @@ button, input, select, textarea, a {
   touch-action: manipulation;
 }
 
+/* Atmospheric Ambient Background */
+body {
+  background-color: #070913;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(225, 48, 108, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 85% 12%, rgba(131, 58, 180, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(252, 176, 69, 0.08) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card:hover {
+  border-color: rgba(225, 48, 108, 0.35);
+  box-shadow: 0 8px 32px -2px rgba(225, 48, 108, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-panel {
+  background: rgba(11, 16, 29, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* iPhone Chassis & Realistic Bezel */
+.iphone-frame {
+  position: relative;
+  border-radius: 48px;
+  background: #02040a;
+  border: 4px solid #1f293d;
+  box-shadow: 
+    0 0 0 2px rgba(255, 255, 255, 0.1),
+    0 25px 60px -15px rgba(0, 0, 0, 0.8),
+    0 0 40px -10px rgba(225, 48, 108, 0.2);
+  overflow: hidden;
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  width: 100px;
+  height: 26px;
+  background: #000;
+  border-radius: 20px;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.dynamic-island::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #101828 40%, #030712 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Vinyl Disc spinning for Reel Audio */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-disc {
+  animation: spinSlow 5s linear infinite;
+}
+
+/* Glow effects */
+.glow-pink {
+  box-shadow: 0 0 25px -4px rgba(225, 48, 108, 0.45);
+}
+
+.glow-purple {
+  box-shadow: 0 0 25px -4px rgba(131, 58, 180, 0.45);
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050811;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* Modal Bottom-sheet animation for mobile */
 @media (max-width: 639px) {
   #ruleModal > div {
-    animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideUpMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }
 
