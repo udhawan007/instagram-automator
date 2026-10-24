@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: instagram-automator
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0

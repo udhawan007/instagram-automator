@@ -1,0 +1,21 @@
+{
+  "name": "instagram-automator",
+  "version": "1.0.0",
+  "description": "Instagram Comment & DM Automation Tool - Hypello Alternative",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "instagram",
+    "automation",
+    "comments",
+    "dm",
+    "meta-graph-api"
+  ],
+  "author": "Udit Dhawan",
+  "license": "MIT"
+}
