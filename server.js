@@ -153,7 +153,7 @@ function evaluateComment(commentText, postId = '', username = 'user', isFollowin
       }
     }
 
-    // 2. Excluded Keywords Check (Negative filter from Hypello)
+    // 2. Excluded Keywords Check (Negative filter)
     let excluded = [];
     try { excluded = JSON.parse(item.excluded_keywords || '[]'); } catch { excluded = []; }
     const hasExcluded = excluded.some(kw => {
@@ -184,7 +184,7 @@ function evaluateComment(commentText, postId = '', username = 'user', isFollowin
     }
 
     if (isMatch) {
-      // 4. Follow-Gate Check (Hypello Follow-Check feature)
+      // 4. Follow-Gate Check (Follow-Check feature)
       if (Boolean(item.require_follow) && !isFollowing) {
         // User must follow first!
         const followPublic = item.follow_check_public_reply || 'Please follow our profile first and check your DMs to unlock the link! 🔒✨';
@@ -556,7 +556,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // Instagram Account & OAuth Endpoints (Hypello-style simplified connection)
+    // Instagram Account & OAuth Endpoints (Direct Meta connection)
     if (pathname === '/api/instagram/status' && req.method === 'GET') {
       const connected = getSetting('ig_connected') === 'true';
       res.writeHead(200);

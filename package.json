@@ -1,7 +1,7 @@
 {
   "name": "instagram-automator",
   "version": "1.0.0",
-  "description": "Instagram Comment & DM Automation Tool - Hypello Alternative",
+  "description": "Instagram Comment & DM Automation Tool",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

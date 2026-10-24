@@ -4,7 +4,7 @@
 
 ![Instagram Comment Automator](public/AppIcon.png)
 
-### The Free, Open-Source Alternative to Hypello & ManyChat.
+### The Free, Open-Source Instagram Automation Engine.
 **Automate comments, enforce Follow-Gates, and dispatch instant DMs on Instagram Reels and Posts — 24/7, with zero monthly subscription fees.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -23,7 +23,7 @@
 
 ## 🌟 Why This Exists
 
-Commercial tools like **Hypello**, **ManyChat**, and **Buffer** charge steep monthly subscriptions ($20 – $100+/month) while placing artificial caps on the number of comments and DMs you can send.
+Commercial tools like **ManyChat** and **Buffer** charge steep monthly subscriptions ($20 – $100+/month) while placing artificial caps on the number of comments and DMs you can send.
 
 **Instagram Comment Automator** gives creators, marketers, and businesses the same powerful Reels & Posts automation capabilities for **$0/month** by connecting directly to Meta’s official, free Graph API.
 

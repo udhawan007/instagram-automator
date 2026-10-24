@@ -434,7 +434,7 @@ async function clearLogs() {
   fetchStatus();
 }
 
-// Settings & Instagram Connection (Hypello Flow)
+// Settings & Instagram Connection
 async function fetchSettings() {
   try {
     const res = await fetch('/api/settings');
@@ -514,7 +514,7 @@ async function fetchInstagramStatus() {
   }
 }
 
-// 1-Click Instagram OAuth Flow (Hypello direct authorization)
+// 1-Click Instagram OAuth Flow (Direct Meta authorization)
 async function startInstagramOAuth() {
   try {
     const res = await fetch('/api/auth/instagram/url');
