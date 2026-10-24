@@ -66,7 +66,7 @@ Drop these proven call-to-action hooks into your **Reel video text**, **captions
 | **💼 Coaching / Consulting** | *"Comment **`AUDIT`** and my team will send you a personalized breakdown of your profile! 📈"* | `audit`, `review`, `strategy` |
 | **📂 Templates / Spreadsheets** | *"I spent 40 hours building this automated tracker. Comment **`TEMPLATE`** to copy it for free! 📊"* | `template`, `sheet`, `copy` |
 
-> 💡 **Built-In 1-Click Templates:** In your dashboard's automation builder, click any of the **Creator Hook Templates** to auto-fill all keywords, follow-gate prompts, and DM bodies instantly.
+> 💡 **How to use a hook:** Copy the trigger keywords from the table into a new automation rule. The dashboard no longer includes a one-click template picker.
 
 ---
 
