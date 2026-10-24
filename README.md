@@ -42,6 +42,44 @@ Commercial tools like **Hypello**, **ManyChat**, and **Buffer** charge steep mon
 
 ---
 
+## 🎨 Built for Creators: Turn Views into Followers & Revenue
+
+If you are a creator, influencer, coach, or brand posting Reels on Instagram, **comment automation is the #1 growth strategy in 2026**:
+
+1. **🚀 Explode the Instagram Algorithm:** Instagram pushes Reels with high comment counts into the Explore page and suggested feeds. By asking viewers to comment a keyword, you multiply your comment volume by 10x–50x.
+2. **📉 Zero "Link-in-Bio" Friction:** Viewers hate leaving Reels to click a bio link. Comment-to-DM delivers the resource directly into their private inbox while they continue watching your content.
+3. **📈 2x–5x Follower Growth via Follow-Gate:** Non-followers who comment receive an interactive message asking them to follow first. Over 70% of viewers complete the follow step to claim their freebie.
+4. **💰 Automated Sales & Lead Generation:** Deliver affiliate links, discount codes, email opt-in pages, or course checkouts on autopilot while you sleep.
+
+---
+
+## 🪝 Battle-Tested Creator Hooks & CTA Library
+
+Drop these proven call-to-action hooks into your **Reel video text**, **captions**, and **audio** to drive thousands of automated comments:
+
+| Niche / Goal | Reel Caption / Video On-Screen Hook | Recommended Trigger Keyword |
+| :--- | :--- | :--- |
+| **📘 Free Blueprint / Ebook** | *"Want the complete 5-step checklist? Comment **`GUIDE`** below and I'll DM it to you right now! 🚀 (Must be following to receive!)"* | `guide`, `link`, `blueprint` |
+| **🏷️ E-Commerce / Flash Sale** | *"Drop a comment with **`VIP`** to get your exclusive 20% discount coupon sent straight to your inbox! 🛍️"* | `vip`, `discount`, `code` |
+| **🎓 Webinar / Course Access** | *"Comment **`ACCESS`** to claim your free seat for this Thursday's live workshop before spots close! 🎟️"* | `access`, `invite`, `seat` |
+| **📸 Influencer Presets / LUTs** | *"Want the exact camera settings & color LUT I used in this reel? Comment **`PRESET`** and I'll send it over! ✨"* | `preset`, `lut`, `filter` |
+| **💼 Coaching / Consulting** | *"Comment **`AUDIT`** and my team will send you a personalized breakdown of your profile! 📈"* | `audit`, `review`, `strategy` |
+| **📂 Templates / Spreadsheets** | *"I spent 40 hours building this automated tracker. Comment **`TEMPLATE`** to copy it for free! 📊"* | `template`, `sheet`, `copy` |
+
+> 💡 **Built-In 1-Click Templates:** In your dashboard's automation builder, click any of the **Creator Hook Templates** to auto-fill all keywords, follow-gate prompts, and DM bodies instantly.
+
+---
+
+## ⚡ Supported Webhook Event Hooks
+
+This tool integrates directly with Meta's real-time Webhook infrastructure:
+
+* **`comments` Hook:** Fires whenever a follower comments on your Reels, Posts, Carousel, or Video uploads.
+* **`messaging_postbacks` Hook:** Triggers when a user taps interactive DM quick-reply buttons (e.g. *"I'm following now ✅"*).
+* **`mentions` Hook (Optional):** Ready to expand for story mentions and tag notifications.
+
+---
+
 ## 📊 How It Works
 
 ```mermaid
