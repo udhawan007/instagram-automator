@@ -1,10 +1,24 @@
+/* Safe area insets for modern mobile displays (iPhone Home Indicator, notches) */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Touch optimizations */
+button, input, select, textarea, a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #050811;
 }
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
@@ -14,17 +28,20 @@
   background: #334155;
 }
 
-/* Animations */
-@keyframes pulseSlow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.02); }
+/* Modal Bottom-sheet animation for mobile */
+@media (max-width: 639px) {
+  #ruleModal > div {
+    animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 }
 
-.animate-pulse-slow {
-  animation: pulseSlow 3s infinite ease-in-out;
-}
-
-/* Smooth transitions */
-input, button, select, textarea {
-  transition: all 0.15s ease-in-out;
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

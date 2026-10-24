@@ -23,24 +23,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Tab Switcher
+// Tab Switcher (handles both Desktop tabs & Mobile Bottom App Bar)
 function switchTab(tabId) {
+  // Hide all tab containers
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  
+  // Desktop tab button highlights
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('border-pink-500', 'text-pink-400', 'font-semibold');
     btn.classList.add('border-transparent', 'text-slate-400');
   });
 
-  const targetTab = document.getElementById(`tab-${tabId}`);
+  // Mobile bottom nav button highlights
+  document.querySelectorAll('.mob-tab-btn').forEach(btn => {
+    btn.classList.remove('text-pink-400', 'font-bold');
+    btn.classList.add('text-slate-400', 'font-medium');
+  });
+
+  // Activate Desktop button
   const targetBtn = document.getElementById(`tab-btn-${tabId}`);
-  if (targetTab && targetBtn) {
-    targetTab.classList.remove('hidden');
+  if (targetBtn) {
     targetBtn.classList.remove('border-transparent', 'text-slate-400');
     targetBtn.classList.add('border-pink-500', 'text-pink-400', 'font-semibold');
   }
 
+  // Activate Mobile button
+  const mobBtn = document.getElementById(`mob-btn-${tabId}`);
+  if (mobBtn) {
+    mobBtn.classList.remove('text-slate-400', 'font-medium');
+    mobBtn.classList.add('text-pink-400', 'font-bold');
+  }
+
+  // Show target content
+  const targetTab = document.getElementById(`tab-${tabId}`);
+  if (targetTab) {
+    targetTab.classList.remove('hidden');
+  }
+
   if (tabId === 'logs') fetchLogs();
   if (tabId === 'automations') fetchAutomations();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   lucide.createIcons();
 }
 
@@ -55,11 +77,11 @@ async function fetchStatus() {
 
     const badge = document.getElementById('modeBadge');
     if (data.mode === 'live') {
-      badge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-pink-500/10 text-pink-400 border border-pink-500/20';
-      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span><span>Live Meta API Connected</span>';
+      badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-pink-500/10 text-pink-400 border border-pink-500/20';
+      badge.innerHTML = '<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-pink-500 animate-ping"></span><span class="hidden sm:inline">Live Connected</span><span class="sm:hidden">Live</span>';
     } else {
-      badge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Sandbox Mode (Testing Safe)</span>';
+      badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      badge.innerHTML = '<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400"></span><span class="hidden sm:inline">Sandbox Mode</span><span class="sm:hidden">Sandbox</span>';
     }
   } catch (e) {
     console.error('Status error:', e);
@@ -85,11 +107,11 @@ function renderAutomations(list) {
 
   if (list.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full border border-dashed border-slate-800 rounded-3xl p-12 text-center space-y-3 bg-slate-900/30">
+      <div class="col-span-full border border-dashed border-slate-800 rounded-3xl p-8 sm:p-12 text-center space-y-3 bg-slate-900/30">
         <i data-lucide="video" class="w-8 h-8 text-slate-600 mx-auto"></i>
         <h3 class="text-sm font-bold text-slate-200">No Reel or Post Automations Configured</h3>
         <p class="text-xs text-slate-500 max-w-sm mx-auto">Create an automation to instantly send links and DMs to followers commenting on your reels.</p>
-        <button onclick="openCreateModal()" class="mt-2 px-4 py-2 rounded-xl text-xs font-bold bg-pink-600 text-white">Create Automation</button>
+        <button onclick="openCreateModal()" class="mt-2 px-4 py-2 rounded-xl text-xs font-bold bg-pink-600 text-white active:scale-95 touch-manipulation">Create Automation</button>
       </div>
     `;
     lucide.createIcons();
@@ -102,11 +124,11 @@ function renderAutomations(list) {
     if (item.post_scope === 'specific_post') scopeLabel = 'Specific Reel';
 
     return `
-      <div class="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-5 space-y-4 hover:border-slate-700/80 transition-all shadow-sm">
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-3.5 sm:space-y-4 hover:border-slate-700/80 transition-all shadow-sm">
         <div class="flex items-start justify-between gap-3">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2 flex-wrap">
-              <h3 class="font-bold text-sm text-white tracking-tight">${escapeHtml(item.name)}</h3>
+          <div class="space-y-1 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h3 class="font-bold text-xs sm:text-sm text-white tracking-tight truncate">${escapeHtml(item.name)}</h3>
               ${item.active ? 
                 '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>' : 
                 '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700">Paused</span>'
@@ -120,27 +142,27 @@ function renderAutomations(list) {
                 <i data-lucide="film" class="w-3 h-3 text-pink-400"></i>
                 <span>${scopeLabel}</span>
               </span>
-              ${item.specific_post_url ? `<span class="font-mono text-slate-500 text-[10px] truncate max-w-[140px]">(${escapeHtml(item.specific_post_url)})</span>` : ''}
+              ${item.specific_post_url ? `<span class="font-mono text-slate-500 text-[10px] truncate max-w-[120px]">(${escapeHtml(item.specific_post_url)})</span>` : ''}
             </div>
           </div>
 
-          <div class="flex items-center gap-1">
-            <button onclick="toggleAutomation(${item.id})" title="Toggle Active" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="toggleAutomation(${item.id})" title="Toggle Active" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95 touch-manipulation">
               <i data-lucide="${item.active ? 'pause' : 'play'}" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="editAutomation(${item.id})" title="Edit" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
+            <button onclick="editAutomation(${item.id})" title="Edit" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95 touch-manipulation">
               <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="deleteAutomation(${item.id})" title="Delete" class="p-2 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition-colors">
+            <button onclick="deleteAutomation(${item.id})" title="Delete" class="p-2 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition-colors active:scale-95 touch-manipulation">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         </div>
 
         <!-- Trigger Keywords & Exclusions -->
-        <div class="space-y-1.5 bg-[#050811] p-3 rounded-2xl border border-slate-800/80 text-xs">
+        <div class="space-y-1.5 bg-[#050811] p-3 rounded-xl sm:rounded-2xl border border-slate-800/80 text-xs">
           <div class="flex items-center justify-between text-[10px] text-slate-400 uppercase font-semibold">
-            <span>Trigger Keywords (${(item.trigger_keywords || []).length}):</span>
+            <span>Keywords (${(item.trigger_keywords || []).length}):</span>
             ${item.keyword_type === 'any_comment' ? '<span class="text-pink-400 font-bold">Any Comment</span>' : '<span>Word Match</span>'}
           </div>
           <div class="flex flex-wrap gap-1.5 pt-0.5">
@@ -159,24 +181,24 @@ function renderAutomations(list) {
         </div>
 
         <!-- Actions Summary -->
-        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
-          <div class="p-2.5 rounded-2xl bg-[#050811] border border-slate-800/80">
+        <div class="grid grid-cols-2 gap-2 text-xs pt-0.5">
+          <div class="p-2.5 rounded-xl sm:rounded-2xl bg-[#050811] border border-slate-800/80">
             <span class="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">
               <i data-lucide="message-square" class="w-3 h-3 text-blue-400"></i>
-              <span>Public Comment Reply</span>
+              <span>Public Reply</span>
             </span>
             <p class="text-slate-300 text-[11px] mt-1 font-medium truncate">
-              ${item.public_reply_enabled ? `${(item.public_replies || []).length} rotating variations` : '<span class="text-slate-500">Disabled</span>'}
+              ${item.public_reply_enabled ? `${(item.public_replies || []).length} variations` : '<span class="text-slate-500">Disabled</span>'}
             </p>
           </div>
 
-          <div class="p-2.5 rounded-2xl bg-[#050811] border border-slate-800/80">
+          <div class="p-2.5 rounded-xl sm:rounded-2xl bg-[#050811] border border-slate-800/80">
             <span class="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">
               <i data-lucide="send" class="w-3 h-3 text-purple-400"></i>
               <span>Direct Message</span>
             </span>
             <p class="text-slate-300 text-[11px] mt-1 font-medium truncate">
-              ${item.dm_enabled ? (item.require_follow ? 'Follow-Locked DM' : `Delivery in ${item.dm_delay_seconds || 0}s`) : '<span class="text-slate-500">Disabled</span>'}
+              ${item.dm_enabled ? (item.require_follow ? 'Follow-Locked' : `${item.dm_delay_seconds || 0}s Delay`) : '<span class="text-slate-500">Disabled</span>'}
             </p>
           </div>
         </div>
@@ -243,41 +265,35 @@ async function runSimulation() {
       dmText.textContent = evalResult.dmMessage || '(DM disabled)';
 
       if (evalResult.isFollowGate) {
-        // Follow-Gate Active: Non-follower must follow first!
-        badge.textContent = `Follow-Gate Active: User Must Follow`;
+        badge.textContent = `Follow-Gate Active`;
         badge.className = 'text-xs font-mono px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30';
 
         dmDelayBadge.textContent = 'Follow Check Sent 🔒';
         dmDelayBadge.className = 'text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 font-mono';
 
-        dmContainer.className = 'max-w-[90%] rounded-2xl rounded-br-none bg-gradient-to-r from-purple-900 via-slate-900 to-purple-900 p-3.5 text-xs text-white shadow-md space-y-2.5 border border-purple-800/40';
-
-        // Show follow action buttons
+        dmContainer.className = 'max-w-[95%] sm:max-w-[90%] rounded-2xl rounded-br-none bg-gradient-to-r from-purple-900 via-slate-900 to-purple-900 p-3.5 text-xs text-white shadow-md space-y-2.5 border border-purple-800/40';
         followButtons.classList.remove('hidden');
       } else {
-        // Unlocked Resource DM
         badge.textContent = `Matched: ${evalResult.automation.name}`;
         badge.className = 'text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
 
         dmDelayBadge.textContent = evalResult.delaySeconds ? `Sent in ${evalResult.delaySeconds}s` : 'Sent Instantly ⚡';
         dmDelayBadge.className = 'text-[10px] text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20 font-mono';
 
-        dmContainer.className = 'max-w-[90%] rounded-2xl rounded-br-none bg-gradient-to-r from-ig-purple via-[#a82582] to-ig-pink p-3.5 text-xs text-white shadow-md space-y-2.5';
-
-        // Hide follow buttons
+        dmContainer.className = 'max-w-[95%] sm:max-w-[90%] rounded-2xl rounded-br-none bg-gradient-to-r from-ig-purple via-[#a82582] to-ig-pink p-3.5 text-xs text-white shadow-md space-y-2.5';
         followButtons.classList.add('hidden');
       }
     } else {
       const isExcluded = evalResult.reason && evalResult.reason.includes('excluded');
-      badge.textContent = isExcluded ? 'Filtered by Excluded Keyword' : 'No Rule Matched';
+      badge.textContent = isExcluded ? 'Excluded Filter' : 'No Match';
       badge.className = isExcluded ? 
         'text-xs font-mono px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20' : 
         'text-xs font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
 
       replyBox.classList.remove('hidden');
-      replyText.textContent = isExcluded ? '⚠️ No public reply (comment contained negative keyword filter).' : '— No public reply triggered —';
-      dmText.textContent = isExcluded ? '⚠️ No DM dispatched (negative keyword filter blocked execution).' : '— No Direct Message triggered —';
-      dmDelayBadge.textContent = 'Blocked / Skipped';
+      replyText.textContent = isExcluded ? '⚠️ No public reply (negative keyword filter blocked execution).' : '— No public reply triggered —';
+      dmText.textContent = isExcluded ? '⚠️ No DM dispatched (negative keyword filter).' : '— No Direct Message triggered —';
+      dmDelayBadge.textContent = 'Skipped';
       dmDelayBadge.className = 'text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full font-mono';
       followButtons.classList.add('hidden');
     }
@@ -304,7 +320,7 @@ function confirmFollowSim() {
   runSimulation();
 }
 
-// Activity Logs
+// Activity Logs (renders both Mobile Cards & Desktop Table)
 async function fetchLogs() {
   try {
     const res = await fetch('/api/logs');
@@ -313,6 +329,8 @@ async function fetchLogs() {
     document.getElementById('logsCountBadge').textContent = logs.length;
 
     const tbody = document.getElementById('logsTableBody');
+    const mobContainer = document.getElementById('logsMobileList');
+
     if (logs.length === 0) {
       tbody.innerHTML = `
         <tr>
@@ -321,9 +339,15 @@ async function fetchLogs() {
           </td>
         </tr>
       `;
+      mobContainer.innerHTML = `
+        <div class="p-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+          No comment activity logged yet.
+        </div>
+      `;
       return;
     }
 
+    // Render Desktop Table
     tbody.innerHTML = logs.map(l => {
       const isSuccess = l.status === 'success';
       const isFollowGate = l.status === 'follow_gate';
@@ -350,6 +374,39 @@ async function fetchLogs() {
         </tr>
       `;
     }).join('');
+
+    // Render Mobile Cards (< 768px)
+    mobContainer.innerHTML = logs.map(l => {
+      const isSuccess = l.status === 'success';
+      const isFollowGate = l.status === 'follow_gate';
+
+      let badgeClass = 'bg-slate-800 text-slate-400';
+      let badgeLabel = 'Ignored';
+      if (isSuccess) {
+        badgeClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        badgeLabel = 'Unlocked DM';
+      } else if (isFollowGate) {
+        badgeClass = 'bg-purple-500/10 text-purple-300 border border-purple-500/20';
+        badgeLabel = 'Follow Gate';
+      }
+
+      return `
+        <div class="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-white">@${escapeHtml(l.username)}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${formatDate(l.timestamp)}</span>
+          </div>
+          <p class="text-xs text-slate-300 bg-[#050811] p-2.5 rounded-xl border border-slate-800/60 break-words">
+            "${escapeHtml(l.comment_text)}"
+          </p>
+          <div class="flex items-center justify-between pt-1 text-[11px]">
+            <span class="text-slate-400 truncate max-w-[160px]">${escapeHtml(l.rule_name || 'No Rule')}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium font-mono ${badgeClass}">${badgeLabel}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
   } catch (e) {
     console.error('Logs error:', e);
   }
@@ -417,7 +474,7 @@ function copyWebhookUrl() {
 
 // Multi-Step Modal Builder
 function openCreateModal() {
-  document.getElementById('modalTitle').textContent = 'Configure Reel / Post Comment Automation';
+  document.getElementById('modalTitle').textContent = 'Configure Comment Automation';
   document.getElementById('ruleId').value = '';
   document.getElementById('ruleName').value = '';
   
@@ -455,7 +512,7 @@ function editAutomation(id) {
   const item = currentAutomations.find(a => a.id === id);
   if (!item) return;
 
-  document.getElementById('modalTitle').textContent = 'Edit Reel / Post Automation';
+  document.getElementById('modalTitle').textContent = 'Edit Comment Automation';
   document.getElementById('ruleId').value = item.id;
   document.getElementById('ruleName').value = item.name || '';
 
